@@ -10,7 +10,7 @@ function showRandomQuote() {
   const selectedQuote = quotes[randomIndex];
 
   const quoteDisplay = document.getElementById("quoteDisplay");
-  quoteDisplay.textContent = `"${selectedQuote.text}" — (${selectedQuote.category})`;
+  quoteDisplay.innerHTML = `"${selectedQuote.text}" — (${selectedQuote.category})`;
 }
 
 
