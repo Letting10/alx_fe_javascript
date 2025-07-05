@@ -165,6 +165,7 @@ function notifyUser(message) {
 
 
 async function fetchQuotesFromServer() {
+ 
   fetch("https://jsonplaceholder.typicode.com/posts")
     .then(response => response.json())
     .then(data => console.log("Fetched from JSONPlaceholder:", data.slice(0, 1)))
@@ -195,6 +196,11 @@ async function fetchQuotesFromServer() {
   }
 }
 
+
+function syncQuotes() {
+  fetchQuotesFromServer(); 
+}
+
 window.onload = () => {
   loadQuotes();
   createAddQuoteForm();
@@ -204,8 +210,8 @@ window.onload = () => {
   document.getElementById("categoryFilter").value = selected;
   filterQuotes();
 
-  setInterval(fetchQuotesFromServer, 30000);
-  fetchQuotesFromServer();
+  setInterval(syncQuotes, 30000); 
+  syncQuotes();
 };
 
 document.getElementById("newQuote").addEventListener("click", filterQuotes);
