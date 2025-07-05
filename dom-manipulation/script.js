@@ -4,8 +4,8 @@ const quotes = [
   { text: "Life is what happens when you're busy making other plans.", category: "Life" }
 ];
 
-// Required function name
-function displayRandomQuote() {
+
+function showRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
   const selectedQuote = quotes[randomIndex];
 
@@ -13,18 +13,17 @@ function displayRandomQuote() {
   quoteDisplay.innerHTML = `"${selectedQuote.text}" — (${selectedQuote.category})`;
 }
 
-// Required event listener
-document.getElementById("newQuote").addEventListener("click", displayRandomQuote);
 
-// Required function name
+document.getElementById("newQuote").addEventListener("click", showRandomQuote);
+
+
 function addQuote(text, category) {
   if (text && category) {
     quotes.push({ text, category });
-    displayRandomQuote(); // show updated quote
+    showRandomQuote(); 
   }
 }
 
-// Required function: create form with inputs and button
 function createAddQuoteForm() {
   const formDiv = document.createElement("div");
 
@@ -56,8 +55,7 @@ function createAddQuoteForm() {
   formDiv.appendChild(inputCategory);
   formDiv.appendChild(addButton);
 
-  document.body.appendChild(formDiv); // add form to page
+  document.body.appendChild(formDiv);
 }
 
-// Call the function to generate the form when the page loads
 createAddQuoteForm();
