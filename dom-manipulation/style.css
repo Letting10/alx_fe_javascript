@@ -1,0 +1,46 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f2f2f2;
+  color: #333;
+  padding: 40px;
+  text-align: center;
+  justify-content: center;
+}
+
+h1 {
+  color: #007BFF;
+}
+
+#quoteDisplay {
+  font-size: 1.2em;
+  font-style: italic;
+  margin: 20px 0;
+  padding: 10px;
+  background-color: #ffffff;
+  border: 1px solid #dfcfcfc4;
+  display: inline-block;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 600px;
+  animation: step-start 1s 1s iteration-count reverse fill-mode;
+}
+
+input {
+  padding: 10px;
+  margin: 5px;
+  width: 200px;
+}
+
+button {
+  padding: 10px 15px;
+  margin: 10px;
+  background-color: #007BFF;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
