@@ -1,5 +1,5 @@
 let quotes = [];
-const SERVER_URL = "https://mockapi.io/api/v1/quotes"; // Replace with real or mock API if needed
+const SERVER_URL = "https://mockapi.io/api/v1/quotes"; 
 
 function loadQuotes() {
   const saved = localStorage.getItem("quotes");
@@ -164,7 +164,7 @@ function notifyUser(message) {
 }
 
 
-async function syncWithServer() {
+async function fetchQuotesFromServer() {
   try {
     const res = await fetch(SERVER_URL);
     const serverQuotes = await res.json();
@@ -199,8 +199,8 @@ window.onload = () => {
   document.getElementById("categoryFilter").value = selected;
   filterQuotes();
 
-  setInterval(syncWithServer, 30000);
-  syncWithServer(); 
+  setInterval(fetchQuotesFromServer, 30000);
+  fetchQuotesFromServer();
 };
 
 document.getElementById("newQuote").addEventListener("click", filterQuotes);
