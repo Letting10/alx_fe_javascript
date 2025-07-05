@@ -1,4 +1,5 @@
 let quotes = [];
+const SERVER_URL = "https://mockapi.io/api/v1/quotes"; // Replace with real or mock API if needed
 
 function loadQuotes() {
   const saved = localStorage.getItem("quotes");
@@ -31,12 +32,23 @@ function showRandomQuote(filteredList = quotes) {
   sessionStorage.setItem("lastQuote", JSON.stringify(selectedQuote));
 }
 
-function addQuote(text, category) {
+async function addQuote(text, category) {
   if (text && category) {
-    quotes.push({ text, category });
+    const newQuote = { text, category };
+    quotes.push(newQuote);
     saveQuotes();
-    populateCategories(); 
-    showRandomQuote();   
+    populateCategories();
+    filterQuotes();
+
+    try {
+      await fetch(SERVER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newQuote)
+      });
+    } catch (err) {
+      console.warn("Server sync failed:", err);
+    }
   }
 }
 
@@ -70,10 +82,8 @@ function createAddQuoteForm() {
   formDiv.appendChild(inputText);
   formDiv.appendChild(inputCategory);
   formDiv.appendChild(addButton);
-
   document.body.appendChild(formDiv);
 }
-
 
 function populateCategories() {
   const categorySelect = document.getElementById("categoryFilter");
@@ -95,10 +105,9 @@ function populateCategories() {
   categorySelect.value = currentValue;
 }
 
-
 function filterQuotes() {
   const selectedCategory = document.getElementById("categoryFilter").value;
-  localStorage.setItem("selectedCategory", selectedCategory); 
+  localStorage.setItem("selectedCategory", selectedCategory);
 
   const filteredQuotes = selectedCategory === "all"
     ? quotes
@@ -106,7 +115,6 @@ function filterQuotes() {
 
   showRandomQuote(filteredQuotes);
 }
-
 
 function exportToJsonFile() {
   const blob = new Blob([JSON.stringify(quotes, null, 2)], { type: "application/json" });
@@ -120,18 +128,22 @@ function exportToJsonFile() {
   URL.revokeObjectURL(url);
 }
 
-
 function importFromJsonFile(event) {
   const fileReader = new FileReader();
   fileReader.onload = function(e) {
     try {
       const importedQuotes = JSON.parse(e.target.result);
       if (Array.isArray(importedQuotes)) {
-        quotes.push(...importedQuotes);
+        importedQuotes.forEach(q => {
+          const exists = quotes.some(local => local.text === q.text && local.category === q.category);
+          if (!exists) {
+            quotes.push(q);
+          }
+        });
         saveQuotes();
         populateCategories();
-        filterQuotes(); 
-        alert("Quotes imported successfully!");
+        filterQuotes();
+        notifyUser("Quotes imported successfully!");
       } else {
         alert("Invalid JSON format.");
       }
@@ -142,6 +154,41 @@ function importFromJsonFile(event) {
   fileReader.readAsText(event.target.files[0]);
 }
 
+function notifyUser(message) {
+  const note = document.getElementById("notification");
+  note.textContent = message;
+  note.style.display = "block";
+  setTimeout(() => {
+    note.style.display = "none";
+  }, 5000);
+}
+
+
+async function syncWithServer() {
+  try {
+    const res = await fetch(SERVER_URL);
+    const serverQuotes = await res.json();
+
+    let updated = false;
+
+    serverQuotes.forEach(serverQuote => {
+      const exists = quotes.some(local => local.text === serverQuote.text && local.category === serverQuote.category);
+      if (!exists) {
+        quotes.push(serverQuote);
+        updated = true;
+      }
+    });
+
+    if (updated) {
+      saveQuotes();
+      populateCategories();
+      filterQuotes();
+      notifyUser("New quotes synced from server.");
+    }
+  } catch (err) {
+    console.warn("Sync failed:", err);
+  }
+}
 
 window.onload = () => {
   loadQuotes();
@@ -150,8 +197,10 @@ window.onload = () => {
 
   const selected = localStorage.getItem("selectedCategory") || "all";
   document.getElementById("categoryFilter").value = selected;
-  filterQuotes(); 
-};
+  filterQuotes();
 
+  setInterval(syncWithServer, 30000);
+  syncWithServer(); 
+};
 
 document.getElementById("newQuote").addEventListener("click", filterQuotes);
