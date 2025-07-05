@@ -165,7 +165,7 @@ function notifyUser(message) {
 
 
 async function fetchQuotesFromServer() {
- 
+
   fetch("https://jsonplaceholder.typicode.com/posts")
     .then(response => response.json())
     .then(data => console.log("Fetched from JSONPlaceholder:", data.slice(0, 1)))
@@ -189,7 +189,7 @@ async function fetchQuotesFromServer() {
       saveQuotes();
       populateCategories();
       filterQuotes();
-      notifyUser("New quotes synced from server.");
+      notifyUser("Quotes synced with server!"); 
     }
   } catch (err) {
     console.warn("Sync with real server failed:", err);
