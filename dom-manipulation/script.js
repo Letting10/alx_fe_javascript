@@ -19,22 +19,29 @@ function saveQuotes() {
 }
 
 function showRandomQuote() {
-  const randomIndex = Math.floor(Math.random() * quotes.length);
-  const selectedQuote = quotes[randomIndex];
+  const selectedCategory = document.getElementById("categoryFilter").value;
 
-  const quoteDisplay = document.getElementById("quoteDisplay");
-  quoteDisplay.innerHTML = `"${selectedQuote.text}" — (${selectedQuote.category})`;
+  const filteredQuotes = selectedCategory === "all"
+    ? quotes
+    : quotes.filter(q => q.category === selectedCategory);
 
- 
+  if (filteredQuotes.length === 0) {
+    document.getElementById("quoteDisplay").innerHTML = "No quotes found in this category.";
+    return;
+  }
+
+  const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+  const selectedQuote = filteredQuotes[randomIndex];
+
+  document.getElementById("quoteDisplay").innerHTML = `"${selectedQuote.text}" — (${selectedQuote.category})`;
   sessionStorage.setItem("lastQuote", JSON.stringify(selectedQuote));
 }
-
-document.getElementById("newQuote").addEventListener("click", showRandomQuote);
 
 function addQuote(text, category) {
   if (text && category) {
     quotes.push({ text, category });
     saveQuotes();
+    populateCategories(); 
     showRandomQuote();
   }
 }
@@ -94,6 +101,7 @@ function importFromJsonFile(event) {
       if (Array.isArray(importedQuotes)) {
         quotes.push(...importedQuotes);
         saveQuotes();
+        populateCategories();
         alert("Quotes imported successfully!");
       } else {
         alert("Invalid JSON format.");
@@ -103,6 +111,23 @@ function importFromJsonFile(event) {
     }
   };
   fileReader.readAsText(event.target.files[0]);
+}
+
+
+function populateCategories() {
+  const categorySelect = document.getElementById("categoryFilter");
+  categorySelect.innerHTML = `<option value="all">All Categories</option>`;
+
+  const categories = quotes
+    .map(q => q.category)
+    .filter((cat, i, self) => self.indexOf(cat) === i);
+
+  categories.forEach(category => {
+    const option = document.createElement("option");
+    option.value = category;
+    option.textContent = category;
+    categorySelect.appendChild(option);
+  });
 }
 
 
@@ -116,4 +141,11 @@ window.onload = () => {
   }
 
   createAddQuoteForm();
+  populateCategories();
 };
+
+
+document.getElementById("categoryFilter").addEventListener("change", showRandomQuote);
+
+
+document.getElementById("newQuote").addEventListener("click", showRandomQuote);
